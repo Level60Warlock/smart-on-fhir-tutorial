@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta http-equiv='X-UA-Compatible' content='IE=edge' />
     <meta http-equiv='Content-Type' content='text/html; charset=utf-8' />
+    <meta http-equiv="Content-Type"
+        content="APPLINK,CCLLINK,MPAGES_EVENT,XMLCCLREQUEST,CCLLINKPOPUP,CCLNEWSESSIONWINDOW,MPAGES_SVC_EVENT"
+        name="discern" />
+
     <title>Level60Warlock Example-SMART-App</title>
 
     <link rel='stylesheet' type='text/css' href='./src/css/example-smart-app.css'>
@@ -10,61 +15,142 @@
       Temporarily disable cerner-smart-embeddable-lib
     <link rel='stylesheet' type='text/css' href='./lib/css/cerner-smart-embeddable-lib-1.0.0.min.css'>
     -->
-  </head>
-  <body>
+
+    <script type="text/javascript">
+        function submitAjaxTransaction() {
+            document.getElementById("prgOutput").innerHTML = "loading..."
+            var prgName = (document.prgInfo.ProgramName.value) ? document.prgInfo.ProgramName.value : null;
+            var prgParams = (document.prgInfo.ProgramParams.value) ? document.prgInfo.ProgramParams.value : null;
+            var srvBinding = (document.prgInfo.ServerBinding.value) ? document.prgInfo.ServerBinding.value : null;
+            var prgBlobIn = (document.prgInfo.BlobInput.value) ? document.prgInfo.BlobInput.value : null;
+
+            var requestAsync = new XMLCclRequest();
+            requestAsync.onreadystatechange = function () {
+                // if (requestAsync.readyState == 4 && requestAsync.status == 200) {
+                //         document.getElementById("prgOutput").innerHTML = requestAsync.responseText;
+                // }
+                //Ignore all states except for 4
+                if (requestAsync.readyState !== 4) {
+                    return;
+                }
+                else if (requestAsync.status !== 200) {
+                    //Handle an execution error
+                    var errorResponse = "<dl><dt>Program Name:</dt><dd>" + prgName + "</dd>" +
+                        "<dt>Parameter Array:</dt><dd>" + prgParams + "</dd>" +
+                        //"<dt>Data Blob:</dt><dd>" + dataBlob + "</dd>" +
+                        "<dt>readyState:</dt><dd>" + requestAsync.readyState + "</dd>" +
+                        "<dt>status:</dt><dd>" + requestAsync.status + "</dd>" +
+                        "<dt>Response:</dt><dd>" + requestAsync.responseText + "</dd></dl>";
+                    document.getElementById("prgOutput").innerHTML = errorResponse;
+                    return;
+                }
+                //If successful, write out response
+                document.getElementById("prgOutput").innerHTML = requestAsync.responseText;
+            };
+
+            if (srvBinding) {
+                requestAsync.requestBinding = srvBinding;
+            }
+            if (prgBlobIn) {
+                requestAsync.setBlobIn(prgBlobIn);
+            }
+            requestAsync.open("GET", prgName, true);
+            requestAsync.send(prgParams);
+        }
+
+
+
+    </script>
+
+</head>
+
+<body>
     <div id='errors'>
     </div>
     <div id="loading" class="spinner">
-      <div class="bounce1"></div>
-      <div class="bounce2"></div>
-      <div class="bounce3"></div>
+        <div class="bounce1"></div>
+        <div class="bounce2"></div>
+        <div class="bounce3"></div>
     </div>
-    <div id='holder' >
-      <h2>Level60Warlock Example-SMART-App</h2>
 
-      <h2>Patient Resource</h2>
-      <table>
-        <tr>
-          <th>First Name:</th>
-          <td id='fname'></td>
-        </tr>
-        <tr>
-          <th>Last Name:</th>
-          <td id='lname'></td>
-        </tr>
-        <tr>
-          <th>Gender:</th>
-          <td id='gender'></td>
-        </tr>
-        <tr>
-          <th>Date of Birth:</th>
-          <td id='birthdate'></td>
-        </tr>
-      </table>
-      <h2>Observation Resource</h2>
-      <table>
-        <tr>
-          <th>Height:</th>
-          <td id='height'></td>
-        </tr>
-        <tr>
-          <th>Systolic Blood Pressure:</th>
-          <td id='systolicbp'></td>
+    <h1>Test of AJAX transactions through XMLCCLREQUEST via win32</h1>
+    <br />
+    <h2>AJAX Transaction Testing</h2>
+    <br />
+    <form name="prgInfo">
+        Program Name:
+        <input type="text" name="ProgramName" value="dio_test" style="width:300px;" />
+        <br />
+        Prompt Parameters:
+        <input type="text" name="ProgramParams" value="^MINE^,^PERSON^,36" style="width:300px;" />
+        <br />
+        Blob Input (NOTE: should NOT be wrapped in quotes):
+        <input type="text" name="BlobInput" style="width:700px;" />
+        <br />
+        Server to route AJAX transaction through (&lt;server_binding_property&gt;_&lt;node_name&gt;)
+        <input type="text" name="ServerBinding" value="cpmscript_mpage_ipsol3" style="width:300px;" />
+        <br />
+    </form>
+    <div>
+        <button onclick="submitAjaxTransaction()">
+            Submit Ajax Transaction
+        </button>
+        <br />
+    </div>
 
-        </tr>
-        <tr>
-          <th>Diastolic Blood Pressure:</th>
-          <td id='diastolicbp'></td>
-        </tr>
-        <tr>
-          <th>LDL:</th>
-          <td id='ldl'></td>
-        </tr>
-        <tr>
-          <th>HDL:</th>
-          <td id='hdl'></td>
-        </tr>
-      </table>
+
+    <hr />
+
+    <div id="prgOutput"></div>
+
+    <hr />
+
+    <div id='holder'>
+        <h2>Level60Warlock Example-SMART-App</h2>
+
+        <h2>Patient Resource</h2>
+        <table>
+            <tr>
+                <th>First Name:</th>
+                <td id='fname'></td>
+            </tr>
+            <tr>
+                <th>Last Name:</th>
+                <td id='lname'></td>
+            </tr>
+            <tr>
+                <th>Gender:</th>
+                <td id='gender'></td>
+            </tr>
+            <tr>
+                <th>Date of Birth:</th>
+                <td id='birthdate'></td>
+            </tr>
+        </table>
+        <h2>Observation Resource</h2>
+        <table>
+            <tr>
+                <th>Height:</th>
+                <td id='height'></td>
+            </tr>
+            <tr>
+                <th>Systolic Blood Pressure:</th>
+                <td id='systolicbp'></td>
+
+            </tr>
+            <tr>
+                <th>Diastolic Blood Pressure:</th>
+                <td id='diastolicbp'></td>
+            </tr>
+            <tr>
+                <th>LDL:</th>
+                <td id='ldl'></td>
+            </tr>
+            <tr>
+                <th>HDL:</th>
+                <td id='hdl'></td>
+            </tr>
+        </table>
     </div>
     <!-- Required JS files to enable this page to embed within an MPage -->
     <!--
@@ -84,18 +170,19 @@
     <script src='./lib/js/fhir-client-cerner-additions-1.0.0.js'></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
     <script>
-      extractData().then(
-        //Display Patient Demographics and Observations if extractData was success
-        function(p) {
-          drawVisualization(p);
-        },
+        extractData().then(
+            //Display Patient Demographics and Observations if extractData was success
+            function (p) {
+                drawVisualization(p);
+            },
 
-        //Display 'Failed to call FHIR Service' if extractData failed
-        function() {
-          $('#loading').hide();
-          $('#errors').html('<p> Failed to call FHIR Service </p>');
-        }
-      );
+            //Display 'Failed to call FHIR Service' if extractData failed
+            function () {
+                $('#loading').hide();
+                $('#errors').html('<p> Failed to call FHIR Service </p>');
+            }
+        );
     </script>
-  </body>
+</body>
+
 </html>
