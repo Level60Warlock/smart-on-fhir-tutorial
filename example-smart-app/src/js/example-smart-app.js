@@ -38,7 +38,7 @@
           var deviceLength = deviceData.length;
           var deviceHTML = "";
           for(var i=0; i<deviceLength; i++){
-            deviceHTML += "<p>"+deviceData[0].deviceName[0].name+"</p>"
+            deviceHTML += "<p>"+deviceData[i].deviceName[0].name+"&nbsp;("+deviceData[i].id+")</p>"
           }
 
           if(deviceLength === 0) {
