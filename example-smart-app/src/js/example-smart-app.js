@@ -34,6 +34,20 @@
 
         $.when(pt, obv, devices).done(function(patient, obv, deviceData) {
           console.log(deviceData);
+
+          var deviceLength = deviceData.length;
+          var deviceHTML = "";
+          for(var i=0; i<deviceLength; i++){
+            deviceHTML += "<p>"+deviceData[0].deviceName[0].name+"</p>"
+          }
+
+          if(deviceLength === 0) {
+            deviceHTML = "<p>No Devices Found</p>"
+          }
+
+
+
+          
           var byCodes = smart.byCodes(obv, 'code');
           var gender = patient.gender;
 
@@ -71,6 +85,8 @@
           p.ldl = getQuantityValueAndUnit(ldl[0]);
           p.temp = getQuantityValueAndUnit(temp[0]);
 
+          p.devices = deviceHTML;
+
           ret.resolve(p);
         });
       } else {
@@ -95,6 +111,7 @@
       ldl: {value: ''},
       hdl: {value: ''},
       temp: {value: ''},
+      devices: {value: ''},
     };
   }
 
@@ -139,6 +156,7 @@
     $('#ldl').html(p.ldl);
     $('#hdl').html(p.hdl);
     $('#temp').html(p.temp);
+    $('#deviceContainer').html(p.devices);
   };
 
 })(window);
