@@ -26,9 +26,14 @@
                     }
                   });
 
-        $.when(pt, obv).fail(onError);
+        var devices = smart.patient.api.fetchAll({
+                    type: 'Device',
+        });
 
-        $.when(pt, obv).done(function(patient, obv) {
+        $.when(pt, obv, devices).fail(onError);
+
+        $.when(pt, obv, devices).done(function(patient, obv, deviceData) {
+          console.log(deviceData);
           var byCodes = smart.byCodes(obv, 'code');
           var gender = patient.gender;
 
